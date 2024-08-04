@@ -15,7 +15,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace api.Controllers
 {
-    [Route("api/birthday")]
+    [Route("api/birthdays")]
     [ApiController]
     public class BirthdayController : ControllerBase
     {
@@ -26,6 +26,20 @@ namespace api.Controllers
         }
 
         [HttpGet]
+        public async Task<IActionResult> Index()
+        {
+            var today = DateTime.Today;
+            var birthdaysDto = await _context.Birthday
+                .Where(b => (b.Date.Month == today.Month && b.Date.Day == today.Day) || b.Date.Month-today.Month==1)
+                .OrderBy(b => b.Date.Month)
+                .ThenBy(b => b.Date.Day)
+                .ToListAsync();
+
+            return Ok(birthdaysDto);
+        }
+
+        [HttpGet]
+        [Route("all")]
         public async Task<IActionResult> GetAll(){
             var birthdays = await _context.Birthday.ToListAsync();
             var birthdaysDto = birthdays.Select(s => s.ToBirthdayDto());
@@ -33,7 +47,7 @@ namespace api.Controllers
         }
 
         [HttpGet]
-        [Route("api/birthday/search/{id:int}")]
+        [Route("search/{id:int}")]
         public async Task<IActionResult> GetById([FromRoute] int id)
         {
             var birthday = await _context.Birthday.FindAsync(id);
@@ -44,42 +58,11 @@ namespace api.Controllers
             return Ok(birthday.ToBirthdayDto());
         }
 
-        [HttpGet]
-        [Route("api/birthdays")]
-        public async Task<IActionResult> Index()
-        {
-            var today = DateTime.Today;
-            var birthdaysDto = await _context.Birthday
-                .Where(b => b.Date.Month >= today.Month && b.Date.Day >= today.Day)
-                .OrderBy(b => b.Date.Day)
-                .ToListAsync();
-
-            return Ok(birthdaysDto);
-        }
-
-        /*[HttpGet]
-        [Route("api/birthday/search/{birthdayName:string}")]
-        public async Task<IActionResult> GetByName([FromRoute] string birthdayName)
-        {
-            var birthdays = from name in _context.Birthday select name;
-            if (!string.IsNullOrEmpty(birthdayName))
-            {
-                birthdays = birthdays.Where(s => s.Name.Contains(birthdayName));
-            }
-            else
-            {
-                return NotFound();
-            }
-            var birthdays2 = new SelectList(await birthdays.Distinct().ToListAsync());
-            return Ok(birthdays);
-        }*/
-
-
         [HttpPost]
+        [Route("new")]
         [Consumes("multipart/form-data")]
         public async Task<IActionResult> Create(string name, DateOnly date, IFormFile file)
         {
-            // Validate the incoming DTO
             CreateBirthdayRequestDto birthdayDto = new CreateBirthdayRequestDto();
             if (name == null)
             {
@@ -115,7 +98,7 @@ namespace api.Controllers
 
 
         [HttpPut]
-        [Route("{id}")]
+        [Route("update/{id}")]
         public async Task<IActionResult> Update([FromRoute] int id, string? name = null, DateOnly? date = null, IFormFile? file = null)
         {
             
@@ -154,7 +137,7 @@ namespace api.Controllers
         }
 
         [HttpDelete]
-        [Route("{id}")]
+        [Route("delete/{id}")]
         public async Task<IActionResult> Delete([FromRoute] int id)
         {
             var birthdayModel = await _context.Birthday.FirstOrDefaultAsync(x => x.Id == id);

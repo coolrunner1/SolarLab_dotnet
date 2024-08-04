@@ -285,3 +285,4 @@
 /home/igor/projects/SolarLab_dotnet/api/obj/Debug/net8.0/api.csproj.CopyComplete
 /home/igor/projects/SolarLab_dotnet/api/obj/Debug/net8.0/api.genruntimeconfig.cache
 /home/igor/projects/SolarLab_dotnet/api/obj/Debug/net8.0/ref/api.dll
+/home/igor/projects/SolarLab_dotnet/api/obj/Debug/net8.0/api.sourcelink.json
