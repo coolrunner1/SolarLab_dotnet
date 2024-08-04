@@ -30,7 +30,7 @@ namespace api.Controllers
         {
             var today = DateTime.Today;
             var birthdaysDto = await _context.Birthday
-                .Where(b => (b.Date.Month == today.Month && b.Date.Day == today.Day) || b.Date.Month-today.Month==1 || b.Date.Month==today.Month)
+                .Where(b => (b.Date.Month == today.Month && b.Date.Day == today.Day) || b.Date.Month-today.Month==1 || b.Date.Month==today.Month || (b.Date.Month==12 && today.Month==1))
                 .OrderBy(b => b.Date.Month)
                 .ThenBy(b => b.Date.Day)
                 .ToListAsync();
